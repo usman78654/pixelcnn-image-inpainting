@@ -1,14 +1,19 @@
 # PixelCNN Image Inpainting
 
-A generative AI model for bedroom image inpainting using PixelCNN. This project demonstrates how to complete partially occluded images using a trained PixelCNN model.
+A generative AI model for bedroom image inpainting using PixelCNN. This project demonstrates how to complete partially occluded images using a trained PixelCNN-based autoregressive model. The implementation includes a fully functional Streamlit web application for interactive image completion.
+
+**Course:** Generative AI - Semester 7  
+**Author:** Usman Tariq (22i-2459)  
+**Assignment:** Image Completion using Autoregressive Models
 
 ## Features
 
-- 🎨 Image inpainting for bedroom scenes
-- 🧠 PixelCNN-based generative model
-- 📊 Model evaluation with MSE, PSNR, and Pixel Accuracy metrics
-- 🎯 Interactive Streamlit application for real-time inference
+- 🎨 Image inpainting for bedroom scenes using autoregressive generation
+- 🧠 PixelCNN-based generative model with masked convolutions
+- 📊 Comprehensive evaluation with MSE, PSNR, and Pixel Accuracy metrics
+- 🎯 Interactive Streamlit web application for real-time inference
 - 📈 Validation set with ground truth comparisons
+- 📋 Detailed academic report with methodology and analysis
 
 ## Model Performance
 
@@ -18,7 +23,9 @@ A generative AI model for bedroom image inpainting using PixelCNN. This project 
 | PSNR | 16.82 dB | ⭐⭐⭐ Moderate |
 | Pixel Accuracy | 7.17% | ⭐⭐ Normal |
 
-**Dataset**: Validation Set (158 images)
+**Dataset:** Validation Set (158 images from bedroom dataset)
+
+**Note:** Pixel accuracy is a strict metric requiring exact RGB matches. The 7.17% is normal for generative models. Visual quality (reflected by PSNR) provides a better assessment of reconstruction quality. For detailed analysis, see [REPORT.md](./REPORT.md).
 
 ## Project Structure
 
@@ -105,9 +112,19 @@ python train.py
 
 PixelCNN is an autoregressive generative model that learns to predict pixel values sequentially, conditioned on previously generated pixels. The architecture includes:
 
-- Multiple masked convolutional layers for autoregressive generation
-- 128 filters and 5 residual blocks
-- 256 output bins for pixel value distribution
+- **Input Layer:** Masked Convolution (Type A) - 7×7 kernel, 3→128 channels
+- **Residual Blocks:** 5 blocks with bottleneck architecture
+- **Intermediate Layer:** 1×1 convolution, 128→1024 channels
+- **Output Layer:** 1×1 convolution, 1024→768 channels (3 RGB channels × 256 intensity bins)
+
+**Total Parameters:** ~2.5M trainable parameters
+
+**Key Components:**
+- **Masked Convolutions:** Enforce autoregressive property (Type A prevents current pixel visibility, Type B allows it for deeper layers)
+- **Residual Blocks:** Enable deeper architecture with skip connections
+- **Sequential Generation:** Each pixel is sampled from the predicted categorical distribution
+
+For detailed architecture explanation, see [REPORT.md - Section 2.3](./REPORT.md#23-model-architecture).
 
 ## Requirements
 
@@ -119,6 +136,13 @@ See `requirements.txt` for full dependencies. Key requirements:
 - Torchvision
 - NumPy
 - Pillow
+
+**Training Configuration:**
+- Optimizer: Adam (lr=1×10⁻⁴)
+- Batch Size: 32
+- Epochs: 50
+- Loss Function: Cross-Entropy (averaged over RGB channels)
+- Image Size: 64×64 pixels
 
 ## Results
 
@@ -163,7 +187,16 @@ python -m streamlit run viewer.py
 
 ## Documentation
 
-For more detailed information, see:
-- [Accuracy Summary](./ACCURACY_SUMMARY.md)
-- [Evaluation Guide](./EVALUATION_GUIDE.md)
-- [Quick Reference](./QUICK_REFERENCE.md)
+### Full Assignment Report
+For comprehensive methodology, results, and analysis, see **[REPORT.md](./REPORT.md)** which includes:
+- Detailed problem formulation and background
+- Complete methodology and dataset description
+- Thorough model architecture explanation with code snippets
+- Quantitative and qualitative results analysis
+- Discussion of challenges and comparisons with alternative approaches
+- Comprehensive references and appendices
+
+### Quick Reference Files
+- [ACCURACY_SUMMARY.md](./ACCURACY_SUMMARY.md) - Model accuracy report
+- [EVALUATION_GUIDE.md](./EVALUATION_GUIDE.md) - Evaluation instructions
+- [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) - Quick command reference
